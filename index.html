@@ -6,196 +6,112 @@
 <title>OT Daily Log</title>
 <style>
   :root {
-    --green-dark:  #2d6a4f;
-    --green-mid:   #40916c;
-    --green-light: #d8f3dc;
-    --green-pale:  #f0faf2;
-    --ink:         #1b2d24;
-    --ink-soft:    #4a6356;
-    --border:      #b7ddc4;
-    --white:       #ffffff;
-    --red:         #c0392b;
-    --radius:      14px;
-    --shadow:      0 2px 12px rgba(45,106,79,.13);
+    --gd:#2d6a4f;--gm:#40916c;--gl:#d8f3dc;--gp:#f0faf2;
+    --ink:#1b2d24;--soft:#4a6356;--bor:#b7ddc4;--wh:#fff;
+    --red:#c0392b;--rad:14px;--shad:0 2px 12px rgba(45,106,79,.13);
+    --cwl:#2d6a4f;--ccl:#1a5276;--jyw:#6e2f8a;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Helvetica Neue', 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-    background: var(--green-pale); color: var(--ink);
-    min-height: 100vh; padding-bottom: 40px;
-  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Helvetica Neue','PingFang HK','Microsoft JhengHei',sans-serif;background:var(--gp);color:var(--ink);min-height:100vh;padding-bottom:48px}
 
-  /* ── Setup screen ── */
-  #setup-screen {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100vh; padding: 30px 20px; text-align: center;
-  }
-  #setup-screen .logo { font-size: 48px; margin-bottom: 16px; }
-  #setup-screen h2 { font-size: 20px; color: var(--green-dark); margin-bottom: 8px; }
-  #setup-screen p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 24px; }
-  #setup-screen input {
-    width: 100%; padding: 14px 16px; font-size: 14px; border-radius: 10px;
-    border: 2px solid var(--border); background: var(--white);
-    font-family: inherit; margin-bottom: 12px; color: var(--ink);
-  }
-  #setup-screen input:focus { outline: none; border-color: var(--green-mid); }
-  .btn-primary {
-    width: 100%; padding: 16px; font-size: 16px; font-weight: 700;
-    background: var(--green-dark); color: var(--white);
-    border: none; border-radius: var(--radius); cursor: pointer;
-    box-shadow: 0 4px 16px rgba(45,106,79,.35);
-  }
+  #setup-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 20px;text-align:center}
+  .logo{font-size:48px;margin-bottom:16px}
+  #setup-screen h2{font-size:20px;color:var(--gd);margin-bottom:8px}
+  #setup-screen p{font-size:14px;color:var(--soft);line-height:1.6;margin-bottom:24px}
 
-  /* ── Main app ── */
-  #app { display: none; }
+  #app{display:none}
+  header{background:var(--gd);color:var(--wh);padding:16px 20px 12px;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  header h1{font-size:16px;font-weight:700}
+  header p{font-size:11px;opacity:.7;margin-top:2px}
 
-  header {
-    background: var(--green-dark); color: var(--white);
-    padding: 16px 20px 12px; position: sticky; top: 0; z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,.2);
-  }
-  header h1 { font-size: 16px; font-weight: 700; }
-  header p  { font-size: 11px; opacity: .7; margin-top: 2px; }
+  .tabs{display:flex;background:var(--gd);border-top:1px solid rgba(255,255,255,.15);position:sticky;top:60px;z-index:19}
+  .tab-btn{flex:1;padding:10px 0;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
+  .tab-btn.active{color:#fff;border-bottom-color:#74c69d}
 
-  .tabs {
-    display: flex; background: var(--green-dark);
-    border-top: 1px solid rgba(255,255,255,.15);
-  }
-  .tab-btn {
-    flex: 1; padding: 10px 0; font-size: 13px; font-weight: 600;
-    color: rgba(255,255,255,.6); background: none; border: none; cursor: pointer;
-    border-bottom: 3px solid transparent; transition: all .2s;
-  }
-  .tab-btn.active { color: #fff; border-bottom-color: #74c69d; }
+  .panel{display:none;padding:14px}
+  .panel.active{display:block}
 
-  .panel { display: none; padding: 16px; }
-  .panel.active { display: block; }
+  .card{background:var(--wh);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--shad);border:1px solid var(--bor)}
+  .card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gm);margin-bottom:10px}
+  .note{font-size:12px;color:var(--soft);line-height:1.5;background:var(--gl);padding:10px 12px;border-radius:8px;margin-bottom:12px}
 
-  .card {
-    background: var(--white); border-radius: var(--radius);
-    padding: 16px; margin-bottom: 12px;
-    box-shadow: var(--shadow); border: 1px solid var(--border);
-  }
-  .card-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .8px; color: var(--green-mid); margin-bottom: 10px;
-  }
+  input[type=date],input[type=text],input[type=url],textarea{width:100%;padding:12px 14px;font-size:15px;border:2px solid var(--bor);border-radius:10px;background:var(--gp);color:var(--ink);font-family:inherit}
+  input[type=date]:focus,input[type=text]:focus,input[type=url]:focus,textarea:focus{outline:none;border-color:var(--gm)}
+  textarea{resize:vertical;min-height:80px;line-height:1.5}
+  textarea::placeholder{color:#9ab8a5}
 
-  input[type="date"] {
-    width: 100%; padding: 12px 14px; font-size: 16px;
-    border: 2px solid var(--border); border-radius: 10px;
-    background: var(--green-pale); color: var(--ink); font-family: inherit;
-  }
-  input[type="date"]:focus { outline: none; border-color: var(--green-mid); }
+  .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .type-btn{padding:14px 10px;font-size:14px;font-weight:600;border:2px solid var(--bor);border-radius:10px;background:var(--wh);color:var(--soft);cursor:pointer;transition:all .15s;text-align:center}
+  .type-btn.selected{background:var(--gd);color:var(--wh);border-color:var(--gd)}
+  .type-icon{display:block;font-size:20px;margin-bottom:4px}
 
-  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .type-btn {
-    padding: 14px 10px; font-size: 14px; font-weight: 600;
-    border: 2px solid var(--border); border-radius: 10px;
-    background: var(--white); color: var(--ink-soft);
-    cursor: pointer; transition: all .15s; text-align: center;
-  }
-  .type-btn.selected { background: var(--green-dark); color: var(--white); border-color: var(--green-dark); }
-  .type-btn .type-icon { display: block; font-size: 20px; margin-bottom: 4px; }
+  .unit-pills{display:flex;gap:8px;margin-bottom:10px}
+  .unit-pill{flex:1;padding:10px 6px;font-size:13px;font-weight:700;border:2px solid var(--bor);border-radius:30px;background:var(--wh);color:var(--soft);cursor:pointer;text-align:center;transition:all .15s}
+  .unit-pill[data-unit=CWL].active{background:var(--cwl);color:#fff;border-color:var(--cwl)}
+  .unit-pill[data-unit=CCL].active{background:var(--ccl);color:#fff;border-color:var(--ccl)}
+  .unit-pill[data-unit=JYW].active{background:var(--jyw);color:#fff;border-color:var(--jyw)}
 
-  select {
-    width: 100%; padding: 12px 14px; font-size: 16px;
-    border: 2px solid var(--border); border-radius: 10px;
-    background: var(--green-pale); color: var(--ink); font-family: inherit;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232d6a4f' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-  }
-  select:focus { outline: none; border-color: var(--green-mid); }
+  #client-search-wrap{display:none}
+  #client-search{width:100%;padding:11px 14px;font-size:15px;border:2px solid var(--bor);border-radius:10px;background:var(--gp);color:var(--ink);font-family:inherit;margin-bottom:6px}
+  #client-search:focus{outline:none;border-color:var(--gm)}
+  #client-dropdown{max-height:200px;overflow-y:auto;border:2px solid var(--bor);border-radius:10px;background:var(--wh);display:none}
+  .cli-opt{padding:12px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--bor)}
+  .cli-opt:last-child{border-bottom:none}
+  .cli-opt:hover{background:var(--gl)}
+  #selected-display{padding:11px 14px;font-size:15px;border:2px solid var(--gm);border-radius:10px;background:var(--gl);color:var(--ink);display:none;cursor:pointer;font-weight:600}
 
-  textarea {
-    width: 100%; padding: 12px 14px; font-size: 15px;
-    border: 2px solid var(--border); border-radius: 10px;
-    background: var(--green-pale); color: var(--ink);
-    font-family: inherit; resize: vertical; min-height: 80px; line-height: 1.5;
-  }
-  textarea:focus { outline: none; border-color: var(--green-mid); }
-  textarea::placeholder { color: #9ab8a5; }
+  .btn-submit{width:100%;padding:17px;font-size:17px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:var(--rad);cursor:pointer;box-shadow:0 4px 16px rgba(45,106,79,.35)}
+  .btn-submit:active{background:#1b4332}
+  .btn-submit:disabled{background:#999;box-shadow:none}
 
-  .btn-submit {
-    width: 100%; padding: 17px; font-size: 17px; font-weight: 700;
-    background: var(--green-dark); color: var(--white);
-    border: none; border-radius: var(--radius); cursor: pointer;
-    box-shadow: 0 4px 16px rgba(45,106,79,.35); transition: background .2s;
-  }
-  .btn-submit:active  { background: #1b4332; }
-  .btn-submit:disabled { background: #999; box-shadow: none; }
+  .unit-tabs{display:flex;margin-bottom:14px;border-radius:10px;overflow:hidden;border:2px solid var(--bor)}
+  .ut-btn{flex:1;padding:11px 6px;font-size:13px;font-weight:700;background:var(--wh);color:var(--soft);border:none;cursor:pointer;border-right:1px solid var(--bor)}
+  .ut-btn:last-child{border-right:none}
+  .ut-btn[data-unit=CWL].active{background:var(--cwl);color:#fff}
+  .ut-btn[data-unit=CCL].active{background:var(--ccl);color:#fff}
+  .ut-btn[data-unit=JYW].active{background:var(--jyw);color:#fff}
+  .badge{display:inline-block;background:rgba(255,255,255,.3);border-radius:20px;padding:1px 7px;font-size:11px;margin-left:3px}
 
-  /* ── Client manager ── */
-  .client-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
-  .client-input-row input[type="text"] {
-    flex: 1; padding: 12px 14px; font-size: 15px;
-    border: 2px solid var(--border); border-radius: 10px;
-    background: var(--green-pale); color: var(--ink); font-family: inherit;
-  }
-  .client-input-row input[type="text"]:focus { outline: none; border-color: var(--green-mid); }
-  .btn-add {
-    padding: 12px 18px; font-size: 22px; font-weight: 700;
-    background: var(--green-dark); color: var(--white);
-    border: none; border-radius: 10px; cursor: pointer;
-  }
-  .client-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 13px 14px; border-bottom: 1px solid var(--border); font-size: 15px;
-  }
-  .client-item:last-child { border-bottom: none; }
-  .btn-delete { background: none; border: none; color: var(--red); font-size: 20px; cursor: pointer; padding: 2px 6px; }
-  .empty-msg  { text-align: center; color: var(--ink-soft); font-size: 14px; padding: 20px 0; }
-  .btn-save-clients {
-    width: 100%; padding: 14px; font-size: 15px; font-weight: 700;
-    background: var(--green-mid); color: var(--white);
-    border: none; border-radius: var(--radius); cursor: pointer; margin-top: 12px;
-  }
-  .section-note {
-    font-size: 12px; color: var(--ink-soft); margin-bottom: 12px; line-height: 1.5;
-    background: var(--green-light); padding: 10px 12px; border-radius: 8px;
-  }
-  .btn-reset {
-    width: 100%; padding: 10px; font-size: 13px;
-    background: none; border: 1px solid var(--border);
-    border-radius: 10px; color: var(--ink-soft); cursor: pointer; margin-top: 8px;
-  }
+  .batch-ta{width:100%;padding:12px 14px;font-size:14px;border:2px solid var(--bor);border-radius:10px;background:var(--gp);color:var(--ink);font-family:inherit;resize:vertical;min-height:110px;line-height:1.9;margin-bottom:8px}
+  .batch-ta:focus{outline:none;border-color:var(--gm)}
+  .btn-batch{width:100%;padding:11px;font-size:14px;font-weight:700;background:var(--gm);color:var(--wh);border:none;border-radius:10px;cursor:pointer;margin-bottom:14px}
+  .add-row{display:flex;gap:8px;margin-bottom:12px}
+  .add-row input{flex:1}
+  .btn-plus{padding:12px 18px;font-size:22px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:10px;cursor:pointer}
 
-  /* ── Toast ── */
-  #toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: var(--ink); color: var(--white);
-    padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600;
-    box-shadow: 0 4px 20px rgba(0,0,0,.3); z-index: 999;
-    transition: transform .3s ease, opacity .3s ease; opacity: 0; white-space: nowrap;
-  }
-  #toast.show    { transform: translateX(-50%) translateY(0); opacity: 1; }
-  #toast.success { background: var(--green-dark); }
-  #toast.error   { background: var(--red); }
+  .cli-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--bor);font-size:15px}
+  .cli-item:last-child{border-bottom:none}
+  .btn-del{background:none;border:none;color:var(--red);font-size:20px;cursor:pointer;padding:2px 8px}
+  .empty-msg{text-align:center;color:var(--soft);font-size:14px;padding:20px 0}
+
+  .btn-save{width:100%;padding:15px;font-size:15px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:var(--rad);cursor:pointer;margin-top:4px;box-shadow:0 4px 16px rgba(45,106,79,.3)}
+  .btn-sec{width:100%;padding:12px;font-size:14px;font-weight:600;background:none;border:2px solid var(--bor);border-radius:10px;color:var(--soft);cursor:pointer;margin-top:8px}
+
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--wh);padding:12px 24px;border-radius:30px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:999;transition:transform .3s,opacity .3s;opacity:0;white-space:nowrap}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  #toast.success{background:var(--gd)}
+  #toast.error{background:var(--red)}
 </style>
 </head>
 <body>
 
-<!-- ═══ SETUP SCREEN ═══ -->
 <div id="setup-screen">
   <div class="logo">🏥</div>
   <h2>OT Daily Log 初次設定</h2>
-  <p>請貼上你的 Google Apps Script<br>網址（以 <strong>script.google.com</strong> 開頭）</p>
+  <p>請貼上你的 Google Apps Script 網址<br>（以 <strong>script.google.com</strong> 開頭）</p>
   <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
-  <button class="btn-primary" onclick="saveApiUrl()">確認並開始使用 →</button>
+  <button class="btn-submit" style="margin-top:4px" onclick="saveApiUrl()">確認並開始使用 →</button>
 </div>
 
-<!-- ═══ MAIN APP ═══ -->
 <div id="app">
   <header>
     <h1>OT Daily Log · 職業治療師探訪記錄</h1>
     <p>匡智水泉澳綜合復康中心</p>
   </header>
-
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('log', this)">📝 記錄</button>
-    <button class="tab-btn" onclick="switchTab('clients', this)">👥 學員名單</button>
-    <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ 設定</button>
+    <button class="tab-btn active" onclick="switchTab('log',this)">📝 記錄</button>
+    <button class="tab-btn" onclick="switchTab('clients',this)">👥 學員名單</button>
+    <button class="tab-btn" onclick="switchTab('settings',this)">⚙️ 設定</button>
   </div>
 
   <!-- LOG -->
@@ -207,25 +123,27 @@
     <div class="card">
       <div class="card-label">🏷 類別</div>
       <div class="type-grid">
-        <button class="type-btn" data-type="Consultation" onclick="selectType(this)">
-          <span class="type-icon">💬</span>Consultation
-        </button>
-        <button class="type-btn" data-type="Assessment" onclick="selectType(this)">
-          <span class="type-icon">📋</span>Assessment
-        </button>
-        <button class="type-btn" data-type="Treatment" onclick="selectType(this)">
-          <span class="type-icon">🤲</span>Treatment
-        </button>
-        <button class="type-btn" data-type="Others" onclick="selectType(this)">
-          <span class="type-icon">📌</span>Others
-        </button>
+        <button class="type-btn" data-type="Consultation" onclick="selType(this)"><span class="type-icon">💬</span>Consultation</button>
+        <button class="type-btn" data-type="Assessment"   onclick="selType(this)"><span class="type-icon">📋</span>Assessment</button>
+        <button class="type-btn" data-type="Treatment"    onclick="selType(this)"><span class="type-icon">🤲</span>Treatment</button>
+        <button class="type-btn" data-type="Others"       onclick="selType(this)"><span class="type-icon">📌</span>Others</button>
       </div>
     </div>
     <div class="card">
       <div class="card-label">👤 學員名稱</div>
-      <select id="client">
-        <option value="">— 選擇學員 —</option>
-      </select>
+      <div class="unit-pills">
+        <button class="unit-pill" data-unit="CWL" onclick="selLogUnit('CWL',this)">CWL</button>
+        <button class="unit-pill" data-unit="CCL" onclick="selLogUnit('CCL',this)">CCL</button>
+        <button class="unit-pill" data-unit="JYW" onclick="selLogUnit('JYW',this)">JYW</button>
+      </div>
+      <div id="client-search-wrap">
+        <input type="text" id="client-search" placeholder="輸入名字篩選…" autocomplete="off"
+               oninput="filterCli()" onfocus="openDD()" onblur="schedClose()">
+        <div id="client-dropdown"></div>
+        <div id="selected-display" onclick="clearSel()">
+          <span id="sel-name"></span> &nbsp;✕
+        </div>
+      </div>
     </div>
     <div class="card">
       <div class="card-label">📝 工作內容</div>
@@ -241,26 +159,32 @@
   <!-- CLIENTS -->
   <div id="panel-clients" class="panel">
     <div class="card">
-      <div class="card-label">新增學員</div>
-      <div class="section-note">輸入學員中文名稱，按 + 加入。記得按「儲存名單」同步至 Google Sheet。</div>
-      <div class="client-input-row">
-        <input type="text" id="newClientName" placeholder="學員名稱（例：陳志康）" maxlength="30"
-               onkeydown="if(event.key==='Enter') addClient()">
-        <button class="btn-add" onclick="addClient()">+</button>
+      <div class="unit-tabs">
+        <button class="ut-btn active" data-unit="CWL" onclick="selMgrUnit('CWL',this)">CWL <span class="badge" id="b-cwl">0</span></button>
+        <button class="ut-btn"        data-unit="CCL" onclick="selMgrUnit('CCL',this)">CCL <span class="badge" id="b-ccl">0</span></button>
+        <button class="ut-btn"        data-unit="JYW" onclick="selMgrUnit('JYW',this)">JYW <span class="badge" id="b-jyw">0</span></button>
       </div>
-      <div id="clientList"></div>
-      <button class="btn-save-clients" onclick="saveClients()">💾 儲存名單至 Google Sheet</button>
+      <div class="note">📋 <strong>批量輸入：</strong>每行一個名字，按「批量加入」一次過加入多個學員。</div>
+      <textarea class="batch-ta" id="batchInput" placeholder="陳志康&#10;陳家慶&#10;陳貴安&#10;（每行一個名字）"></textarea>
+      <button class="btn-batch" onclick="batchAdd()">📥 批量加入</button>
+      <div class="add-row">
+        <input type="text" id="singleInput" placeholder="逐個輸入名字" maxlength="30"
+               onkeydown="if(event.key==='Enter')singleAdd()">
+        <button class="btn-plus" onclick="singleAdd()">+</button>
+      </div>
+      <div id="cli-list"></div>
     </div>
+    <button class="btn-save" onclick="saveClients()">💾 儲存全部名單至 Google Sheet</button>
   </div>
 
   <!-- SETTINGS -->
   <div id="panel-settings" class="panel">
     <div class="card">
       <div class="card-label">⚙️ Apps Script 網址</div>
-      <div class="section-note">如需更換連結的 Google Sheet，在此更新網址。</div>
-      <input type="url" id="settingsUrl" placeholder="https://script.google.com/macros/s/.../exec"
-             style="width:100%;padding:12px 14px;font-size:13px;border:2px solid var(--border);border-radius:10px;background:var(--green-pale);color:var(--ink);font-family:inherit;margin-bottom:10px;">
-      <button class="btn-save-clients" onclick="updateApiUrl()">更新網址</button>
+      <div class="note">如需更換連結的 Google Sheet，在此更新網址。</div>
+      <input type="url" id="settingsUrl" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:10px">
+      <button class="btn-save" onclick="updUrl()">更新網址</button>
+      <button class="btn-sec"  onclick="reloadCli()">🔄 重新載入學員名單</button>
     </div>
   </div>
 </div>
@@ -268,186 +192,181 @@
 <div id="toast"></div>
 
 <script>
-  const STORAGE_KEY_URL     = 'ot_api_url';
-  const STORAGE_KEY_CLIENTS = 'ot_clients';
+const UNITS=['CWL','CCL','JYW'];
+let API='',selType_='',selClient='',logUnit='',mgrUnit='CWL';
+let clients={CWL:[],CCL:[],JYW:[]};
 
-  let selectedType = '';
-  let clients = [];
-  let API_URL = '';
+window.onload=()=>{
+  API=localStorage.getItem('ot_api_url')||'';
+  if(API)showApp();
+  setToday();
+};
 
-  // ── Boot ──
-  window.onload = function () {
-    API_URL = localStorage.getItem(STORAGE_KEY_URL) || '';
-    if (API_URL) {
-      showApp();
-    }
-    setTodayDate();
-  };
+function saveApiUrl(){
+  const v=document.getElementById('apiUrlInput').value.trim();
+  if(!v.startsWith('https://script.google.com')){alert('網址格式不正確');return;}
+  localStorage.setItem('ot_api_url',v);API=v;showApp();
+}
+function showApp(){
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('settingsUrl').value=API;
+  loadClients();
+}
+function setToday(){
+  const d=new Date(),p=n=>String(n).padStart(2,'0'),el=document.getElementById('date');
+  if(el)el.value=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
 
-  function saveApiUrl() {
-    const val = document.getElementById('apiUrlInput').value.trim();
-    if (!val.startsWith('https://script.google.com')) {
-      alert('網址格式不正確，必須以 https://script.google.com 開頭');
-      return;
-    }
-    localStorage.setItem(STORAGE_KEY_URL, val);
-    API_URL = val;
-    showApp();
-  }
+// Tabs
+function switchTab(n,b){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');b.classList.add('active');
+}
 
-  function showApp() {
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('settingsUrl').value = API_URL;
-    loadClients();
-  }
+// Log panel
+function selType(b){
+  document.querySelectorAll('.type-btn').forEach(x=>x.classList.remove('selected'));
+  b.classList.add('selected');selType_=b.dataset.type;
+}
+function selLogUnit(u,b){
+  document.querySelectorAll('.unit-pill').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');logUnit=u;selClient='';
+  document.getElementById('client-search').value='';
+  document.getElementById('client-search').style.display='block';
+  document.getElementById('selected-display').style.display='none';
+  document.getElementById('client-search-wrap').style.display='block';
+  document.getElementById('client-search').focus();
+  renderDD('');
+}
+function filterCli(){renderDD(document.getElementById('client-search').value.trim());}
+function renderDD(q){
+  const dd=document.getElementById('client-dropdown');
+  const list=(clients[logUnit]||[]).filter(n=>!q||n.includes(q)).sort();
+  dd.innerHTML=list.length
+    ?list.map(n=>`<div class="cli-opt" onmousedown="pickCli('${n}')">${n}</div>`).join('')
+    :'<div class="cli-opt" style="color:#999">沒有符合結果</div>';
+  dd.style.display='block';
+}
+function openDD(){if(logUnit)renderDD(document.getElementById('client-search').value.trim());}
+let ct;
+function schedClose(){ct=setTimeout(()=>document.getElementById('client-dropdown').style.display='none',200);}
+function pickCli(n){
+  clearTimeout(ct);selClient=n;
+  document.getElementById('client-search').value='';
+  document.getElementById('client-dropdown').style.display='none';
+  document.getElementById('client-search').style.display='none';
+  document.getElementById('sel-name').textContent=n;
+  document.getElementById('selected-display').style.display='block';
+}
+function clearSel(){
+  selClient='';
+  document.getElementById('selected-display').style.display='none';
+  document.getElementById('client-search').style.display='block';
+  document.getElementById('client-search').value='';
+  document.getElementById('client-search').focus();
+  renderDD('');
+}
+async function submitLog(){
+  const date=document.getElementById('date').value;
+  const content=document.getElementById('content').value.trim();
+  const notes=document.getElementById('notes').value.trim();
+  if(!date)    return toast('請選擇日期','error');
+  if(!selType_)return toast('請選擇類別','error');
+  if(!selClient)return toast('請選擇學員','error');
+  if(!content) return toast('請填寫工作內容','error');
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='提交中…';
+  try{
+    await api({action:'log',date,type:selType_,client:selClient,content,notes});
+    toast('✓ 記錄已儲存！','success');
+    document.getElementById('content').value='';document.getElementById('notes').value='';
+    clearSel();
+    document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));selType_='';
+  }catch(e){toast('錯誤：'+e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='提交記錄 ✓';}
+}
 
-  function updateApiUrl() {
-    const val = document.getElementById('settingsUrl').value.trim();
-    if (!val.startsWith('https://script.google.com')) {
-      showToast('網址格式不正確', 'error'); return;
-    }
-    localStorage.setItem(STORAGE_KEY_URL, val);
-    API_URL = val;
-    showToast('✓ 網址已更新', 'success');
-  }
+// Client manager
+function selMgrUnit(u,b){
+  document.querySelectorAll('.ut-btn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');mgrUnit=u;
+  document.getElementById('singleInput').value='';
+  document.getElementById('batchInput').value='';
+  renderMgrList();
+}
+function batchAdd(){
+  const raw=document.getElementById('batchInput').value;
+  const names=raw.split('\n').map(n=>n.trim()).filter(n=>n);
+  let added=0;
+  names.forEach(n=>{if(!clients[mgrUnit].includes(n)){clients[mgrUnit].push(n);added++;}});
+  document.getElementById('batchInput').value='';
+  renderMgrList();updBadges();
+  toast(`✓ 加入了 ${added} 個學員 (${mgrUnit})`,'success');
+}
+function singleAdd(){
+  const inp=document.getElementById('singleInput'),n=inp.value.trim();
+  if(!n)return;
+  if(clients[mgrUnit].includes(n)){toast('此學員已在名單中','error');return;}
+  clients[mgrUnit].push(n);inp.value='';inp.focus();
+  renderMgrList();updBadges();
+}
+function delCli(u,n){clients[u]=clients[u].filter(x=>x!==n);renderMgrList();updBadges();}
+function renderMgrList(){
+  const div=document.getElementById('cli-list');
+  const list=[...clients[mgrUnit]].sort();
+  div.innerHTML=list.length
+    ?list.map(n=>`<div class="cli-item"><span>${n}</span><button class="btn-del" onclick="delCli('${mgrUnit}','${n}')">✕</button></div>`).join('')
+    :'<div class="empty-msg">此單位名單為空</div>';
+}
+function updBadges(){
+  document.getElementById('b-cwl').textContent=clients.CWL.length;
+  document.getElementById('b-ccl').textContent=clients.CCL.length;
+  document.getElementById('b-jyw').textContent=clients.JYW.length;
+}
+async function saveClients(){
+  try{
+    await api({action:'saveClients',data:JSON.stringify(clients)});
+    localStorage.setItem('ot_clients',JSON.stringify(clients));
+    toast('✓ 名單已儲存！','success');
+  }catch(e){toast('錯誤：'+e.message,'error');}
+}
+async function loadClients(){
+  const c=localStorage.getItem('ot_clients');
+  if(c){try{clients=JSON.parse(c);renderMgrList();updBadges();}catch(_){}}
+  try{
+    const d=await api({action:'getClients'});
+    clients=d.clients||{CWL:[],CCL:[],JYW:[]};
+    localStorage.setItem('ot_clients',JSON.stringify(clients));
+    renderMgrList();updBadges();
+  }catch(e){toast('無法載入名單：'+e.message,'error');}
+}
+function reloadCli(){loadClients();toast('重新載入中…');}
 
-  function setTodayDate() {
-    const d   = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    const el  = document.getElementById('date');
-    if (el) el.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  }
+// Settings
+function updUrl(){
+  const v=document.getElementById('settingsUrl').value.trim();
+  if(!v.startsWith('https://script.google.com')){toast('網址格式不正確','error');return;}
+  localStorage.setItem('ot_api_url',v);API=v;toast('✓ 網址已更新','success');
+}
 
-  // ── Tabs ──
-  function switchTab(name, btn) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('panel-' + name).classList.add('active');
-    btn.classList.add('active');
-  }
+// API
+async function api(params){
+  const u=new URL(API);
+  Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+  const r=await fetch(u.toString()),d=await r.json();
+  if(!d.ok)throw new Error(d.error||'Unknown error');
+  return d;
+}
 
-  // ── Type ──
-  function selectType(btn) {
-    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedType = btn.dataset.type;
-  }
-
-  // ── API call helper ──
-  async function apiCall(params) {
-    const url = new URL(API_URL);
-    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-    const res  = await fetch(url.toString());
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Unknown error');
-    return data;
-  }
-
-  // ── Submit log ──
-  async function submitLog() {
-    const date    = document.getElementById('date').value;
-    const client  = document.getElementById('client').value;
-    const content = document.getElementById('content').value.trim();
-    const notes   = document.getElementById('notes').value.trim();
-
-    if (!date)         return showToast('請選擇日期', 'error');
-    if (!selectedType) return showToast('請選擇類別', 'error');
-    if (!client)       return showToast('請選擇學員', 'error');
-    if (!content)      return showToast('請填寫工作內容', 'error');
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.textContent = '提交中…';
-
-    try {
-      await apiCall({ action: 'log', date, type: selectedType, client, content, notes });
-      showToast('✓ 記錄已儲存！', 'success');
-      document.getElementById('content').value = '';
-      document.getElementById('notes').value   = '';
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
-      selectedType = '';
-    } catch (err) {
-      showToast('錯誤：' + err.message, 'error');
-    } finally {
-      btn.disabled = false; btn.textContent = '提交記錄 ✓';
-    }
-  }
-
-  // ── Load clients ──
-  async function loadClients() {
-    // Load from local cache first for instant render
-    const cached = localStorage.getItem(STORAGE_KEY_CLIENTS);
-    if (cached) { clients = JSON.parse(cached); renderClientDropdown(); renderClientList(); }
-
-    // Then sync from sheet
-    try {
-      const data = await apiCall({ action: 'getClients' });
-      clients = data.clients || [];
-      localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
-      renderClientDropdown();
-      renderClientList();
-    } catch (err) {
-      showToast('無法載入學員名單：' + err.message, 'error');
-    }
-  }
-
-  function renderClientDropdown() {
-    const sel = document.getElementById('client');
-    const cur = sel.value;
-    sel.innerHTML = '<option value="">— 選擇學員 —</option>';
-    [...clients].sort().forEach(name => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = name;
-      sel.appendChild(opt);
-    });
-    sel.value = cur;
-  }
-
-  function renderClientList() {
-    const div = document.getElementById('clientList');
-    if (clients.length === 0) {
-      div.innerHTML = '<div class="empty-msg">名單為空，請新增學員</div>'; return;
-    }
-    div.innerHTML = [...clients].sort().map(name => `
-      <div class="client-item">
-        <span>${name}</span>
-        <button class="btn-delete" onclick="deleteClient('${name}')">✕</button>
-      </div>`).join('');
-  }
-
-  function addClient() {
-    const input = document.getElementById('newClientName');
-    const name  = input.value.trim();
-    if (!name) return;
-    if (clients.includes(name)) { showToast('此學員已在名單中', 'error'); return; }
-    clients.push(name);
-    renderClientDropdown(); renderClientList();
-    input.value = ''; input.focus();
-  }
-
-  function deleteClient(name) {
-    clients = clients.filter(c => c !== name);
-    renderClientDropdown(); renderClientList();
-  }
-
-  async function saveClients() {
-    try {
-      await apiCall({ action: 'saveClients', data: JSON.stringify(clients) });
-      localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
-      showToast('✓ 名單已儲存！', 'success');
-    } catch (err) {
-      showToast('錯誤：' + err.message, 'error');
-    }
-  }
-
-  // ── Toast ──
-  let toastTimer;
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'show ' + type;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.className = ''; }, 2500);
-  }
+// Toast
+let tt;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show '+type;
+  clearTimeout(tt);tt=setTimeout(()=>t.className='',2500);
+}
 </script>
 </body>
 </html>
