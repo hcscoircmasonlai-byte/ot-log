@@ -14,43 +14,48 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{font-family:'Helvetica Neue','PingFang HK','Microsoft JhengHei',sans-serif;background:var(--gp);color:var(--ink);min-height:100vh;padding-bottom:48px}
 
+  /* Setup */
   #setup-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 20px;text-align:center}
   .logo{font-size:48px;margin-bottom:16px}
   #setup-screen h2{font-size:20px;color:var(--gd);margin-bottom:8px}
   #setup-screen p{font-size:14px;color:var(--soft);line-height:1.6;margin-bottom:24px}
 
+  /* App shell */
   #app{display:none}
   header{background:var(--gd);color:var(--wh);padding:16px 20px 12px;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.2)}
   header h1{font-size:16px;font-weight:700}
   header p{font-size:11px;opacity:.7;margin-top:2px}
-
   .tabs{display:flex;background:var(--gd);border-top:1px solid rgba(255,255,255,.15);position:sticky;top:60px;z-index:19}
-  .tab-btn{flex:1;padding:10px 0;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
+  .tab-btn{flex:1;padding:9px 0;font-size:12px;font-weight:600;color:rgba(255,255,255,.6);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s}
   .tab-btn.active{color:#fff;border-bottom-color:#74c69d}
-
   .panel{display:none;padding:14px}
   .panel.active{display:block}
 
+  /* Cards */
   .card{background:var(--wh);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--shad);border:1px solid var(--bor)}
   .card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gm);margin-bottom:10px}
   .note{font-size:12px;color:var(--soft);line-height:1.5;background:var(--gl);padding:10px 12px;border-radius:8px;margin-bottom:12px}
 
+  /* Inputs */
   input[type=date],input[type=text],input[type=url],textarea{width:100%;padding:12px 14px;font-size:15px;border:2px solid var(--bor);border-radius:10px;background:var(--gp);color:var(--ink);font-family:inherit}
   input[type=date]:focus,input[type=text]:focus,input[type=url]:focus,textarea:focus{outline:none;border-color:var(--gm)}
   textarea{resize:vertical;min-height:80px;line-height:1.5}
   textarea::placeholder{color:#9ab8a5}
 
+  /* Type buttons */
   .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .type-btn{padding:14px 10px;font-size:14px;font-weight:600;border:2px solid var(--bor);border-radius:10px;background:var(--wh);color:var(--soft);cursor:pointer;transition:all .15s;text-align:center}
   .type-btn.selected{background:var(--gd);color:var(--wh);border-color:var(--gd)}
   .type-icon{display:block;font-size:20px;margin-bottom:4px}
 
+  /* Unit pills */
   .unit-pills{display:flex;gap:8px;margin-bottom:10px}
   .unit-pill{flex:1;padding:10px 6px;font-size:13px;font-weight:700;border:2px solid var(--bor);border-radius:30px;background:var(--wh);color:var(--soft);cursor:pointer;text-align:center;transition:all .15s}
   .unit-pill[data-unit=CWL].active{background:var(--cwl);color:#fff;border-color:var(--cwl)}
   .unit-pill[data-unit=CCL].active{background:var(--ccl);color:#fff;border-color:var(--ccl)}
   .unit-pill[data-unit=JYW].active{background:var(--jyw);color:#fff;border-color:var(--jyw)}
 
+  /* Client search */
   #client-search-wrap{display:none}
   #client-search{width:100%;padding:11px 14px;font-size:15px;border:2px solid var(--bor);border-radius:10px;background:var(--gp);color:var(--ink);font-family:inherit;margin-bottom:6px}
   #client-search:focus{outline:none;border-color:var(--gm)}
@@ -60,10 +65,16 @@
   .cli-opt:hover{background:var(--gl)}
   #selected-display{padding:11px 14px;font-size:15px;border:2px solid var(--gm);border-radius:10px;background:var(--gl);color:var(--ink);display:none;cursor:pointer;font-weight:600}
 
+  /* Buttons */
   .btn-submit{width:100%;padding:17px;font-size:17px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:var(--rad);cursor:pointer;box-shadow:0 4px 16px rgba(45,106,79,.35)}
   .btn-submit:active{background:#1b4332}
   .btn-submit:disabled{background:#999;box-shadow:none}
+  .btn-save{width:100%;padding:15px;font-size:15px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:var(--rad);cursor:pointer;margin-top:4px;box-shadow:0 4px 16px rgba(45,106,79,.3)}
+  .btn-sec{width:100%;padding:12px;font-size:14px;font-weight:600;background:none;border:2px solid var(--bor);border-radius:10px;color:var(--soft);cursor:pointer;margin-top:8px}
+  .btn-batch{width:100%;padding:11px;font-size:14px;font-weight:700;background:var(--gm);color:var(--wh);border:none;border-radius:10px;cursor:pointer;margin-bottom:14px}
+  .btn-plus{padding:12px 18px;font-size:22px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:10px;cursor:pointer}
 
+  /* Unit tabs (manager) */
   .unit-tabs{display:flex;margin-bottom:14px;border-radius:10px;overflow:hidden;border:2px solid var(--bor)}
   .ut-btn{flex:1;padding:11px 6px;font-size:13px;font-weight:700;background:var(--wh);color:var(--soft);border:none;cursor:pointer;border-right:1px solid var(--bor)}
   .ut-btn:last-child{border-right:none}
@@ -72,21 +83,47 @@
   .ut-btn[data-unit=JYW].active{background:var(--jyw);color:#fff}
   .badge{display:inline-block;background:rgba(255,255,255,.3);border-radius:20px;padding:1px 7px;font-size:11px;margin-left:3px}
 
+  /* Batch / single add */
   .batch-ta{width:100%;padding:12px 14px;font-size:14px;border:2px solid var(--bor);border-radius:10px;background:var(--gp);color:var(--ink);font-family:inherit;resize:vertical;min-height:110px;line-height:1.9;margin-bottom:8px}
   .batch-ta:focus{outline:none;border-color:var(--gm)}
-  .btn-batch{width:100%;padding:11px;font-size:14px;font-weight:700;background:var(--gm);color:var(--wh);border:none;border-radius:10px;cursor:pointer;margin-bottom:14px}
   .add-row{display:flex;gap:8px;margin-bottom:12px}
   .add-row input{flex:1}
-  .btn-plus{padding:12px 18px;font-size:22px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:10px;cursor:pointer}
-
   .cli-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--bor);font-size:15px}
   .cli-item:last-child{border-bottom:none}
   .btn-del{background:none;border:none;color:var(--red);font-size:20px;cursor:pointer;padding:2px 8px}
   .empty-msg{text-align:center;color:var(--soft);font-size:14px;padding:20px 0}
 
-  .btn-save{width:100%;padding:15px;font-size:15px;font-weight:700;background:var(--gd);color:var(--wh);border:none;border-radius:var(--rad);cursor:pointer;margin-top:4px;box-shadow:0 4px 16px rgba(45,106,79,.3)}
-  .btn-sec{width:100%;padding:12px;font-size:14px;font-weight:600;background:none;border:2px solid var(--bor);border-radius:10px;color:var(--soft);cursor:pointer;margin-top:8px}
+  /* ── PDF Panel ── */
+  .pdf-date-wrap{margin-bottom:16px}
+  .pdf-btn{
+    width:100%;padding:18px;font-size:18px;font-weight:700;
+    background:var(--gd);color:var(--wh);border:none;border-radius:var(--rad);
+    cursor:pointer;box-shadow:0 4px 16px rgba(45,106,79,.35);
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .pdf-btn:disabled{background:#999;box-shadow:none;cursor:default}
 
+  #pdf-status{margin-top:16px;display:none}
+  .status-card{border-radius:var(--rad);padding:18px;text-align:center}
+  .status-card.loading{background:var(--gl);border:2px solid var(--bor)}
+  .status-card.success{background:#e8f5e9;border:2px solid #81c784}
+  .status-card.error  {background:#fdecea;border:2px solid #e57373}
+  .status-icon{font-size:36px;margin-bottom:8px}
+  .status-title{font-size:16px;font-weight:700;margin-bottom:6px}
+  .status-sub{font-size:13px;color:var(--soft);margin-bottom:14px;line-height:1.5}
+  .btn-open-pdf{
+    display:inline-block;padding:13px 28px;font-size:15px;font-weight:700;
+    background:var(--gd);color:var(--wh);border-radius:10px;text-decoration:none;
+    box-shadow:0 3px 12px rgba(45,106,79,.3);
+  }
+  .spinner{
+    width:28px;height:28px;border:3px solid rgba(255,255,255,.3);
+    border-top-color:#fff;border-radius:50%;
+    animation:spin .8s linear infinite;display:inline-block;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Toast */
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--wh);padding:12px 24px;border-radius:30px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:999;transition:transform .3s,opacity .3s;opacity:0;white-space:nowrap}
   #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
   #toast.success{background:var(--gd)}
@@ -95,6 +132,7 @@
 </head>
 <body>
 
+<!-- SETUP -->
 <div id="setup-screen">
   <div class="logo">🏥</div>
   <h2>OT Daily Log 初次設定</h2>
@@ -103,6 +141,7 @@
   <button class="btn-submit" style="margin-top:4px" onclick="saveApiUrl()">確認並開始使用 →</button>
 </div>
 
+<!-- APP -->
 <div id="app">
   <header>
     <h1>OT Daily Log · 職業治療師探訪記錄</h1>
@@ -110,7 +149,8 @@
   </header>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('log',this)">📝 記錄</button>
-    <button class="tab-btn" onclick="switchTab('clients',this)">👥 學員名單</button>
+    <button class="tab-btn" onclick="switchTab('pdf',this)">📄 匯出</button>
+    <button class="tab-btn" onclick="switchTab('clients',this)">👥 名單</button>
     <button class="tab-btn" onclick="switchTab('settings',this)">⚙️ 設定</button>
   </div>
 
@@ -154,6 +194,26 @@
       <textarea id="notes" placeholder="e.g. Change spoon, refer to physio…" style="min-height:60px"></textarea>
     </div>
     <button class="btn-submit" id="submitBtn" onclick="submitLog()">提交記錄 ✓</button>
+  </div>
+
+  <!-- PDF EXPORT -->
+  <div id="panel-pdf" class="panel">
+    <div class="card">
+      <div class="card-label">📄 匯出每日工作表 PDF</div>
+      <div class="note">
+        選擇日期後，系統會自動將該日的記錄填入 Progress 工作表並匯出為 PDF，儲存至你的 Google Drive「Visiting Record」資料夾。
+      </div>
+      <div class="pdf-date-wrap">
+        <input type="date" id="pdf-date">
+      </div>
+      <button class="pdf-btn" id="pdfBtn" onclick="generatePDF()">
+        <span>📄</span> 生成並儲存 PDF
+      </button>
+    </div>
+
+    <div id="pdf-status">
+      <!-- filled dynamically -->
+    </div>
   </div>
 
   <!-- CLIENTS -->
@@ -214,18 +274,20 @@ function showApp(){
   loadClients();
 }
 function setToday(){
-  const d=new Date(),p=n=>String(n).padStart(2,'0'),el=document.getElementById('date');
-  if(el)el.value=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  const v=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const el=document.getElementById('date');if(el)el.value=v;
+  const ep=document.getElementById('pdf-date');if(ep)ep.value=v;
 }
 
 // Tabs
 function switchTab(n,b){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
   document.getElementById('panel-'+n).classList.add('active');b.classList.add('active');
 }
 
-// Log panel
+// ── LOG ──
 function selType(b){
   document.querySelectorAll('.type-btn').forEach(x=>x.classList.remove('selected'));
   b.classList.add('selected');selType_=b.dataset.type;
@@ -281,14 +343,63 @@ async function submitLog(){
   try{
     await api({action:'log',date,type:selType_,client:selClient,content,notes});
     toast('✓ 記錄已儲存！','success');
-    document.getElementById('content').value='';document.getElementById('notes').value='';
+    document.getElementById('content').value='';
+    document.getElementById('notes').value='';
     clearSel();
-    document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));selType_='';
+    document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
+    selType_='';
   }catch(e){toast('錯誤：'+e.message,'error');}
   finally{btn.disabled=false;btn.textContent='提交記錄 ✓';}
 }
 
-// Client manager
+// ── PDF ──
+async function generatePDF(){
+  const date=document.getElementById('pdf-date').value;
+  if(!date)return toast('請選擇日期','error');
+
+  const btn=document.getElementById('pdfBtn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> 處理中，請稍候…';
+
+  const statusDiv=document.getElementById('pdf-status');
+  statusDiv.style.display='block';
+  statusDiv.innerHTML=`
+    <div class="status-card loading">
+      <div class="status-icon">⏳</div>
+      <div class="status-title">正在生成 PDF…</div>
+      <div class="status-sub">正在填寫 Progress 工作表並匯出，<br>通常需要 10–20 秒，請勿關閉頁面。</div>
+    </div>`;
+
+  try{
+    const d=await api({action:'generatePDF',date});
+    const [y,m,day]=date.split('-');
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label=`${parseInt(day)}-${months[parseInt(m)-1]}-${y}`;
+    statusDiv.innerHTML=`
+      <div class="status-card success">
+        <div class="status-icon">✅</div>
+        <div class="status-title">PDF 已成功儲存！</div>
+        <div class="status-sub">
+          日期：${label}<br>
+          共 ${d.count} 條記錄<br>
+          已儲存至 Google Drive「Visiting Record」資料夾
+        </div>
+        <a class="btn-open-pdf" href="${d.url}" target="_blank">📂 開啟 PDF</a>
+      </div>`;
+  }catch(e){
+    statusDiv.innerHTML=`
+      <div class="status-card error">
+        <div class="status-icon">❌</div>
+        <div class="status-title">匯出失敗</div>
+        <div class="status-sub">${e.message}</div>
+      </div>`;
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<span>📄</span> 生成並儲存 PDF';
+  }
+}
+
+// ── CLIENTS ──
 function selMgrUnit(u,b){
   document.querySelectorAll('.ut-btn').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');mgrUnit=u;
