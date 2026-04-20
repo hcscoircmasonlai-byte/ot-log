@@ -1523,78 +1523,51 @@
 </div>
 
 <script>
-// ═════════════════ DATA ═════════════════
+// ═════════════════ CONFIG ═════════════════
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrbwb5MLJgXPTDYq0guIyft-eU6W8l1vJ5D10Gt-eYoFPTGCK9VinOPjL6ZSpLakY4/exec';
+const LS_URL     = 'ot_script_url';
+const LS_CLIENTS = 'ot_clients_cache';
+const LS_DRAFTS  = 'ot_drafts';
+const LS_PREFS   = 'ot_prefs';
+const LS_EXPORTS = 'ot_exports_cache';
+
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const TYPE_META = {
-  Consultation: { icon:'#i-chat', zh:'諮詢' },
+  Consultation: { icon:'#i-chat',      zh:'諮詢' },
   Assessment:   { icon:'#i-clipboard', zh:'評估' },
-  Treatment:    { icon:'#i-heart', zh:'治療' },
-  Others:       { icon:'#i-pin', zh:'其他' }
+  Treatment:    { icon:'#i-heart',     zh:'治療' },
+  Others:       { icon:'#i-pin',       zh:'其他' }
 };
-
-// Mock client names (original — not copying any real roster)
-const CLIENTS = {
-  CWL: ['陳志康','陳家慶','陳貴安','何德泰','何籽晴','余浚鴻','吳嘉儀','林偉明','梁家豪','張美萍','張麗笑','徐國俊','戴子恆','招潤銘','曾淑美','李俊陞','李雅詠','梁雅嫣','周雪梅','許文軒','黃志華','馬麗珍','高海琴','潘志強','羅文俊','蔡曉晴','鄭國榮','鍾嘉威','韋志雄','顏凱欣','石明信','譚家穎','廖淑儀','劉子謙','莊美玲','伍錦華','呂瑞明','胡文杰','謝永昌','吳家樂','鄧志文','陸慧敏','溫家俊','袁美華','范偉傑','凌海東','何詠嵐','童嘉倫','尹靜宜'],
-  CCL: ['阮嘉敏','方曉聰','古浩然','丘美琪','丘俊健','朱凱盈','甘家明','白俊生','田文傑','朱惠芳','石宇軒','任國威','李兆豐','李家安','沈雅怡','辛曉茵','周志傑','周慧雯','孟浩南','季惠萍','林家寶','林婉儀','金志強','洪俊彥','紀小文','胡雅芬','范家樂','韋雅欣','凌慧儀','唐慧妍','孫家俊','徐海倫','袁文濤','屠海珊','崔家明','張國安','張慧怡','曹俊軒','梁文浩','莊淑英','許偉庭','郭曉琪','陸嘉怡','陳佩儀','陶志文','彭家強','馮慧君','黃俊宏','楊美儀','葉嘉明','萬文傑'],
-  JYW: ['趙志堅','趙詠欣','程家榮','鄧家俊','鄧惠敏','黎文軒','潘俊華','蔡嘉琳','鄭家偉','羅美珊','蕭俊杰','謝慧儀','薛家樂','鍾偉東','魏雅文','饒俊熙','戴雅琳','孟嘉瑩','石俊強','莫慧琳','盧家明','龐詠芝','歐俊傑','阮家俊','葉俊豪','董雅欣','賈文博','辛家慧','呂慧敏','駱俊安','秦雅文','柯家銘','冼惠珊','湯俊熙','卓文傑','龍慧君','丘俊傑','金家穎','廖嘉文','倪雅欣']
-};
-
-// Generate realistic mock visits data
-function genVisits(dataset){
-  const list = [];
-  const today = new Date(2026, 3, 20); // Apr 20 2026
-  const count = dataset === 'light' ? 18 : 50;
-  const contents = [
-    'Bedside turning + positioning',
-    'Smart Board training session',
-    'Feeding assessment with new spoon',
-    'Upper limb rehab 30 min',
-    'ADL evaluation + equipment',
-    'Hand grip strengthening',
-    'Wheelchair positioning review',
-    'Cognitive training exercises',
-    'Carer education — transfer',
-    'Splint adjustment + review',
-    'Home programme walkthrough',
-    'Sensory integration',
-    'Group therapy — fine motor'
-  ];
-  const types = ['Consultation','Assessment','Treatment','Treatment','Treatment','Others'];
-  const units = Object.keys(CLIENTS);
-  for (let i = 0; i < count; i++){
-    const d = new Date(today); d.setDate(d.getDate() - Math.floor(i/3));
-    const unit = units[Math.floor(Math.random()*units.length)];
-    const roster = CLIENTS[unit];
-    list.push({
-      date: d,
-      type: types[Math.floor(Math.random()*types.length)],
-      unit,
-      client: roster[Math.floor(Math.random()*roster.length)],
-      content: contents[Math.floor(Math.random()*contents.length)],
-      notes: Math.random() > 0.6 ? 'Review next week' : ''
-    });
-  }
-  return list;
-}
 
 // ═════════════════ STATE ═════════════════
 let state = {
-  date: new Date(2026,3,20),
-  type: null,
-  unit: 'CWL',
-  client: null,
-  content: '',
-  notes: '',
-  mgrUnit: 'CWL',
-  mgrSearch: '',
+  date: new Date(),
+  type: null, unit: 'CWL', client: null, content: '', notes: '',
+  mgrUnit: 'CWL', mgrSearch: '',
   visits: [],
-  clients: JSON.parse(JSON.stringify(CLIENTS))
+  clients: { CWL: [], CCL: [], JYW: [] },
+  clientsLoaded: false,
+  statsLoaded: false,
+  exportsLoaded: false
 };
+let prefs  = { defaultToday:true, autoClear:true, dailyReminder:false, offlineDraft:true };
 let tweaks = { ...TWEAK_DEFAULTS };
 
+// ═════════════════ API ═════════════════
+function getScriptUrl() { return localStorage.getItem(LS_URL) || DEFAULT_SCRIPT_URL; }
+
+async function api(params) {
+  const url = getScriptUrl();
+  if (!url) throw new Error('請先在「設定」中填入 Apps Script 網址。');
+  const qs  = new URLSearchParams(params).toString();
+  const res = await fetch(`${url}?${qs}`, { redirect: 'follow' });
+  const txt = await res.text();
+  try { return JSON.parse(txt); } catch(_) { return { ok: false, error: txt }; }
+}
+
 // ═════════════════ BOOT ═════════════════
-function boot(){
-  state.visits = genVisits(tweaks.mockDataset);
+async function boot() {
+  loadPrefs();
   applyTweaks();
   initDates();
   initTabs();
@@ -1605,17 +1578,79 @@ function boot(){
   initClients();
   initSettings();
   setupEditMode();
-  renderAll();
+
+  // Show cached clients immediately, then refresh from sheet
+  const cached = localStorage.getItem(LS_CLIENTS);
+  if (cached) { try { state.clients = JSON.parse(cached); state.clientsLoaded = true; renderClients(); renderClientCounts(); } catch(_){} }
+
+  // Parallel: fresh clients + recent records
+  await Promise.all([ loadClients(), loadRecentRecords() ]);
+  syncDrafts();
 }
 
-function renderAll(){
-  renderSummaryPills();
-  renderRecent();
-  renderTodaySummary();
-  renderClients();
-  renderStatsForCurrentMonth();
-  renderPDFRecent();
+// ═════════════════ CLIENTS LOAD ═════════════════
+async function loadClients() {
+  try {
+    const res = await api({ action: 'getClients' });
+    if (res.ok) {
+      state.clients = res.clients;
+      state.clientsLoaded = true;
+      localStorage.setItem(LS_CLIENTS, JSON.stringify(state.clients));
+      renderClients(); renderClientCounts();
+    }
+  } catch(e) {
+    if (!state.clientsLoaded) toast('無法連接 Google Sheet，使用本機快取', 'error');
+  }
 }
+
+// ═════════════════ RECENT RECORDS ═════════════════
+async function loadRecentRecords() {
+  try {
+    const res = await api({ action: 'getRecords', limit: 20 });
+    if (res.ok) {
+      state.visits = res.records.map(r => ({
+        date: new Date(r.date + 'T00:00:00'),
+        type: r.type, unit: r.unit || guessUnit(r.client),
+        client: r.client, content: r.content, notes: r.notes || ''
+      }));
+      renderRecent(); renderTodaySummary();
+    }
+  } catch(_) {}
+}
+
+function guessUnit(name) {
+  for (const u of ['CWL','CCL','JYW']) { if ((state.clients[u]||[]).includes(name)) return u; }
+  return '';
+}
+
+// ═════════════════ OFFLINE DRAFTS ═════════════════
+function saveDraft(entry) {
+  const drafts = getDrafts(); drafts.push({ ...entry, _id: Date.now() });
+  localStorage.setItem(LS_DRAFTS, JSON.stringify(drafts));
+}
+function getDrafts() { try { return JSON.parse(localStorage.getItem(LS_DRAFTS)||'[]'); } catch(_){ return []; } }
+
+async function syncDrafts() {
+  const drafts = getDrafts(); if (!drafts.length) return;
+  const remaining = [];
+  for (const d of drafts) {
+    try {
+      const res = await api({ action:'log', date:ymd(new Date(d.date)), type:d.type, client:d.client, unit:d.unit, content:d.content, notes:d.notes||'' });
+      if (!res.ok) remaining.push(d);
+    } catch(_) { remaining.push(d); }
+  }
+  localStorage.setItem(LS_DRAFTS, JSON.stringify(remaining));
+  if (remaining.length < drafts.length) {
+    toast(`✓ ${drafts.length - remaining.length} 條離線記錄已同步`, 'success');
+    await loadRecentRecords();
+  }
+}
+
+// ═════════════════ PREFS ═════════════════
+function loadPrefs() {
+  try { const s = JSON.parse(localStorage.getItem(LS_PREFS)||'{}'); prefs = {...prefs,...s}; } catch(_) {}
+}
+function savePref(key, val) { prefs[key]=val; localStorage.setItem(LS_PREFS, JSON.stringify(prefs)); }
 
 // ═════════════════ DATES ═════════════════
 function pad(n){ return String(n).padStart(2,'0'); }
@@ -1625,57 +1660,55 @@ function formatDateLong(d){
   return `${wkd} · ${d.getDate()} ${MONTH_NAMES[d.getMonth()].slice(0,3)} ${d.getFullYear()}`;
 }
 function initDates(){
+  const today = new Date();
+  state.date = today;
   const dEl = document.getElementById('date');
-  dEl.value = ymd(state.date);
+  dEl.value = ymd(today);
   dEl.addEventListener('change', e => {
     state.date = new Date(e.target.value + 'T00:00:00');
     document.querySelectorAll('.date-quick button').forEach(b => b.classList.remove('on'));
-    renderDateDisplay();
-    renderSummaryPills();
+    renderDateDisplay(); renderSummaryPills(); renderTodaySummary();
   });
   document.querySelectorAll('.date-quick button').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('.date-quick button').forEach(x => x.classList.remove('on'));
       b.classList.add('on');
-      const d = new Date(2026,3,20);
+      const d = new Date();
       if (b.dataset.qd === 'yesterday') d.setDate(d.getDate()-1);
-      state.date = d;
-      dEl.value = ymd(d);
-      renderDateDisplay();
-      renderSummaryPills();
+      state.date = d; dEl.value = ymd(d);
+      renderDateDisplay(); renderSummaryPills(); renderTodaySummary();
     });
   });
   const pdfEl = document.getElementById('pdf-date');
-  if (pdfEl) pdfEl.value = ymd(state.date);
+  if (pdfEl) pdfEl.value = ymd(today);
   const smEl = document.getElementById('stats-month');
-  if (smEl) smEl.value = `${state.date.getFullYear()}-${pad(state.date.getMonth()+1)}`;
+  if (smEl) smEl.value = `${today.getFullYear()}-${pad(today.getMonth()+1)}`;
   renderDateDisplay();
 }
-function renderDateDisplay(){
-  document.getElementById('date-display').textContent = formatDateLong(state.date);
-}
+function renderDateDisplay(){ document.getElementById('date-display').textContent = formatDateLong(state.date); }
 
 // ═════════════════ TABS ═════════════════
 function initTabs(){
   const tabs = document.querySelectorAll('.tab');
   const indicator = document.getElementById('tab-indicator');
   function moveIndicator(el){
-    const r = el.getBoundingClientRect();
-    const pr = el.parentElement.getBoundingClientRect();
+    const r = el.getBoundingClientRect(), pr = el.parentElement.getBoundingClientRect();
     indicator.style.transform = `translateX(${r.left - pr.left}px)`;
     indicator.style.width = `${r.width}px`;
   }
   tabs.forEach(t => {
     t.addEventListener('click', () => {
-      tabs.forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
+      tabs.forEach(x => x.classList.remove('active')); t.classList.add('active');
       moveIndicator(t);
       const name = t.dataset.tab;
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       document.getElementById('panel-' + name).classList.add('active');
+      // Lazy-load on first visit to tab
+      if (name === 'stats'   && !state.statsLoaded)   fetchStats();
+      if (name === 'pdf'     && !state.exportsLoaded) loadPDFExports();
+      if (name === 'clients' && !state.clientsLoaded) loadClients();
     });
   });
-  // Initial
   requestAnimationFrame(() => moveIndicator(document.querySelector('.tab.active')));
   window.addEventListener('resize', () => moveIndicator(document.querySelector('.tab.active')));
 }
@@ -1686,28 +1719,19 @@ function initSegs(){
     const btns = seg.querySelectorAll('.seg-btn');
     const indicator = seg.querySelector('.seg-indicator');
     function move(el){
-      const r = el.getBoundingClientRect();
-      const pr = seg.getBoundingClientRect();
+      const r = el.getBoundingClientRect(), pr = seg.getBoundingClientRect();
       indicator.style.transform = `translateX(${r.left - pr.left - 4}px)`;
       indicator.style.width = `${r.width}px`;
     }
     btns.forEach(b => {
       b.addEventListener('click', () => {
-        btns.forEach(x => x.classList.remove('on'));
-        b.classList.add('on');
-        seg.dataset.unit = b.dataset.unit;
-        move(b);
+        btns.forEach(x => x.classList.remove('on')); b.classList.add('on');
+        seg.dataset.unit = b.dataset.unit; move(b);
         if (seg.id === 'unit-seg') {
-          state.unit = b.dataset.unit;
-          state.client = null;
+          state.unit = b.dataset.unit; state.client = null;
           document.getElementById('client-search').value = '';
-          renderClientDropdown('');
-          renderSelectedDisplay();
-          renderSummaryPills();
-        } else if (seg.id === 'mgr-seg') {
-          state.mgrUnit = b.dataset.unit;
-          renderClients();
-        }
+          renderClientDropdown(''); renderSelectedDisplay(); renderSummaryPills();
+        } else if (seg.id === 'mgr-seg') { state.mgrUnit = b.dataset.unit; renderClients(); }
       });
     });
     requestAnimationFrame(() => move(seg.querySelector('.seg-btn.on')));
@@ -1720,33 +1744,28 @@ function initLog(){
   document.querySelectorAll('.type-btn').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('.type-btn').forEach(x => x.classList.remove('selected'));
-      b.classList.add('selected');
-      state.type = b.dataset.type;
-      renderSummaryPills();
+      b.classList.add('selected'); state.type = b.dataset.type; renderSummaryPills();
     });
   });
   const search = document.getElementById('client-search');
-  search.addEventListener('input', e => renderClientDropdown(e.target.value.trim()));
-  search.addEventListener('focus', () => renderClientDropdown(search.value.trim()));
-  search.addEventListener('blur', () => setTimeout(() => document.getElementById('client-dropdown').classList.remove('open'), 200));
+  search.addEventListener('input',  e => renderClientDropdown(e.target.value.trim()));
+  search.addEventListener('focus',  () => renderClientDropdown(search.value.trim()));
+  search.addEventListener('blur',   () => setTimeout(() => document.getElementById('client-dropdown').classList.remove('open'), 200));
   search.addEventListener('keydown', e => {
     const dd = document.getElementById('client-dropdown');
     if (!dd.classList.contains('open')) return;
     const opts = [...dd.querySelectorAll('.cli-opt:not(.cli-opt-empty)')];
     let i = opts.findIndex(o => o.classList.contains('kb-focus'));
-    if (e.key === 'ArrowDown') { e.preventDefault(); i = (i+1)%opts.length; opts.forEach(o => o.classList.remove('kb-focus')); opts[i]?.classList.add('kb-focus'); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); i = (i-1+opts.length)%opts.length; opts.forEach(o => o.classList.remove('kb-focus')); opts[i]?.classList.add('kb-focus'); }
+    if (e.key === 'ArrowDown')  { e.preventDefault(); i=(i+1)%opts.length; opts.forEach(o=>o.classList.remove('kb-focus')); opts[i]?.classList.add('kb-focus'); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); i=(i-1+opts.length)%opts.length; opts.forEach(o=>o.classList.remove('kb-focus')); opts[i]?.classList.add('kb-focus'); }
     else if (e.key === 'Enter' && opts[i]) { e.preventDefault(); pickClient(opts[i].dataset.name); }
   });
-
   document.getElementById('content').addEventListener('input', e => {
     state.content = e.target.value;
     document.getElementById('content-count').textContent = e.target.value.length;
     renderSummaryPills();
   });
-  document.getElementById('notes').addEventListener('input', e => {
-    state.notes = e.target.value;
-  });
+  document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; });
   document.getElementById('submitBtn').addEventListener('click', submitLog);
 }
 
@@ -1755,16 +1774,11 @@ function renderClientDropdown(q){
   const roster = state.clients[state.unit] || [];
   const list = roster.filter(n => !q || n.toLowerCase().includes(q.toLowerCase())).sort();
   if (!list.length) {
-    dd.innerHTML = `<div class="cli-opt-empty">沒有符合結果 No matches</div>`;
+    dd.innerHTML = `<div class="cli-opt-empty">${state.clientsLoaded ? '沒有符合結果 No matches' : '載入中… Loading'}</div>`;
   } else {
-    dd.innerHTML = list.slice(0, 30).map(n =>
-      `<div class="cli-opt" data-name="${n}">
-        <span>${n}</span>
-        <span class="cli-unit">${state.unit}</span>
-      </div>`).join('');
-    dd.querySelectorAll('.cli-opt').forEach(el => {
-      el.addEventListener('mousedown', () => pickClient(el.dataset.name));
-    });
+    dd.innerHTML = list.slice(0,30).map(n =>
+      `<div class="cli-opt" data-name="${n}"><span>${n}</span><span class="cli-unit">${state.unit}</span></div>`).join('');
+    dd.querySelectorAll('.cli-opt').forEach(el => el.addEventListener('mousedown', () => pickClient(el.dataset.name)));
   }
   dd.classList.add('open');
 }
@@ -1772,8 +1786,7 @@ function pickClient(n){
   state.client = n;
   document.getElementById('client-search').value = '';
   document.getElementById('client-dropdown').classList.remove('open');
-  renderSelectedDisplay();
-  renderSummaryPills();
+  renderSelectedDisplay(); renderSummaryPills();
 }
 function renderSelectedDisplay(){
   const el = document.getElementById('selected-display');
@@ -1789,67 +1802,68 @@ function clearClient(){ state.client = null; renderSelectedDisplay(); renderSumm
 
 function renderSummaryPills(){
   const s = document.getElementById('summary-pills');
-  const parts = [];
-  parts.push(`<b>${formatDateLong(state.date)}</b>`);
-  if (state.type) parts.push(`<span class="divot">·</span> <b>${state.type}</b>`);
-  else parts.push(`<span class="divot">·</span> 選擇類別`);
-  if (state.client) parts.push(`<span class="divot">·</span> <b>${state.client}</b> <span class="mono" style="opacity:.6">${state.unit}</span>`);
-  else parts.push(`<span class="divot">·</span> 選擇學員`);
+  const parts = [`<b>${formatDateLong(state.date)}</b>`];
+  parts.push(state.type   ? `<span class="divot">·</span> <b>${state.type}</b>`                                                        : `<span class="divot">·</span> 選擇類別`);
+  parts.push(state.client ? `<span class="divot">·</span> <b>${state.client}</b> <span class="mono" style="opacity:.6">${state.unit}</span>` : `<span class="divot">·</span> 選擇學員`);
   if (!state.content) parts.push(`<span class="divot">·</span> 填寫工作內容`);
   s.innerHTML = parts.join(' ');
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = !(state.type && state.client && state.content.trim());
+  document.getElementById('submitBtn').disabled = !(state.type && state.client && state.content.trim());
 }
 
-function submitLog(){
-  if (!state.type || !state.client || !state.content.trim()) {
-    toast('請填寫所有必要欄位', 'error');
-    return;
-  }
+async function submitLog(){
+  if (!state.type || !state.client || !state.content.trim()) { toast('請填寫所有必要欄位','error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span> 提交中…';
-  setTimeout(() => {
-    state.visits.unshift({
-      date: new Date(state.date),
-      type: state.type,
-      unit: state.unit,
-      client: state.client,
-      content: state.content,
-      notes: state.notes
-    });
-    toast('✓ 記錄已儲存 · Entry saved', 'success');
+
+  const entry = { date:ymd(state.date), type:state.type, unit:state.unit, client:state.client, content:state.content, notes:state.notes||'' };
+  const localEntry = { ...entry, date: new Date(state.date) };
+
+  try {
+    const res = await api({ action:'log', ...entry });
+    if (!res.ok) throw new Error(res.error || '提交失敗');
+    state.visits.unshift(localEntry);
+    toast('✓ 記錄已儲存至 Google Sheet','success');
+  } catch(err) {
+    if (prefs.offlineDraft) {
+      saveDraft(entry);
+      state.visits.unshift(localEntry);
+      toast('離線中 · 已儲存草稿，稍後自動同步','error');
+    } else {
+      toast('提交失敗：' + err.message,'error');
+      btn.disabled = false;
+      btn.innerHTML = '<span>提交記錄</span><svg style="width:16px;height:16px"><use href="#i-arrow-right"/></svg>';
+      return;
+    }
+  }
+
+  if (prefs.autoClear) {
     state.type = null; state.client = null; state.content = ''; state.notes = '';
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
     document.getElementById('content').value = '';
     document.getElementById('notes').value = '';
     document.getElementById('content-count').textContent = '0';
     renderSelectedDisplay();
-    renderSummaryPills();
-    renderRecent();
-    renderTodaySummary();
-    renderStatsForCurrentMonth();
-    btn.innerHTML = '<span>提交記錄</span><svg style="width:16px;height:16px"><use href="#i-arrow-right"/></svg>';
-  }, 800);
+  }
+  renderSummaryPills(); renderRecent(); renderTodaySummary();
+  btn.innerHTML = '<span>提交記錄</span><svg style="width:16px;height:16px"><use href="#i-arrow-right"/></svg>';
+  btn.disabled = !(state.type && state.client && state.content.trim());
 }
 
 function renderRecent(){
-  const list = state.visits.slice(0, 5);
+  const list = state.visits.slice(0,5);
   const el = document.getElementById('recent-list');
   if (!list.length){ el.innerHTML = emptyState('i-edit','尚未有記錄','提交的記錄會顯示於此。'); return; }
   el.innerHTML = list.map(v => {
-    const relative = relativeTime(v.date);
     const meta = TYPE_META[v.type] || TYPE_META.Others;
+    const unit = v.unit || guessUnit(v.client);
     return `
       <div class="mini-entry">
         <div class="mini-type"><svg><use href="${meta.icon}"/></svg></div>
         <div class="mini-info">
-          <div class="mini-top">
-            <div class="mini-name">${v.client}</div>
-            <div class="mini-time">${relative}</div>
-          </div>
+          <div class="mini-top"><div class="mini-name">${v.client}</div><div class="mini-time">${relativeTime(v.date)}</div></div>
           <div class="mini-body">${v.content}</div>
-          <div class="mini-tag" data-u="${v.unit}">${v.type} · ${v.unit}</div>
+          <div class="mini-tag" data-u="${unit}">${v.type}${unit?' · '+unit:''}</div>
         </div>
       </div>`;
   }).join('');
@@ -1858,22 +1872,20 @@ function renderRecent(){
 function renderTodaySummary(){
   const todayStr = ymd(state.date);
   const today = state.visits.filter(v => ymd(v.date) === todayStr);
-  const target = 8;
   document.getElementById('today-done').textContent = today.length;
-  document.getElementById('today-done').nextElementSibling.textContent = ` / ${target}`;
+  document.getElementById('today-done').nextElementSibling.textContent = ` / 8`;
   document.getElementById('today-clients').textContent = new Set(today.map(v => v.client)).size;
   document.getElementById('today-treat').textContent = today.filter(v => v.type === 'Treatment').length;
 }
 
 function relativeTime(d){
-  const now = new Date(2026,3,20,17,0);
-  const diff = Math.floor((now - d)/60000);
-  if (diff < 1) return 'Just now';
-  if (diff < 60) return diff + 'm ago';
+  const diff = Math.floor((new Date() - d)/60000);
+  if (diff < 1)    return 'Just now';
+  if (diff < 60)   return diff + 'm ago';
   if (diff < 1440) return Math.floor(diff/60) + 'h ago';
   const days = Math.floor(diff/1440);
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return days + 'd ago';
+  if (days === 1)  return 'Yesterday';
+  if (days < 7)    return days + 'd ago';
   return `${d.getDate()} ${MONTH_NAMES[d.getMonth()].slice(0,3)}`;
 }
 function emptyState(icon,title,desc){
@@ -1881,66 +1893,116 @@ function emptyState(icon,title,desc){
 }
 
 // ═════════════════ PDF ═════════════════
-function initPDF(){
-  document.getElementById('pdfBtn').addEventListener('click', () => {
-    const date = document.getElementById('pdf-date').value;
-    if (!date) return toast('請選擇日期','error');
-    const btn = document.getElementById('pdfBtn');
-    const status = document.getElementById('pdf-status');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span> 處理中…';
+function initPDF(){ document.getElementById('pdfBtn').addEventListener('click', generatePDF); }
+
+async function generatePDF(){
+  const date = document.getElementById('pdf-date').value;
+  if (!date) return toast('請選擇日期','error');
+  const btn = document.getElementById('pdfBtn'), status = document.getElementById('pdf-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span> 處理中…';
+  status.innerHTML = `
+    <div class="status-card loading">
+      <div class="status-icon"><span class="spinner"></span></div>
+      <div class="status-body">
+        <div class="status-title">正在生成 PDF…</div>
+        <div class="status-sub">填寫 Progress 工作表並匯出至 Google Drive。通常需要 15–30 秒。</div>
+      </div>
+    </div>`;
+  try {
+    const res = await api({ action:'generatePDF', date });
+    if (!res.ok) throw new Error(res.error || 'PDF 生成失敗');
     status.innerHTML = `
-      <div class="status-card loading">
-        <div class="status-icon"><span class="spinner"></span></div>
+      <div class="status-card success">
+        <div class="status-icon"><svg><use href="#i-check"/></svg></div>
         <div class="status-body">
-          <div class="status-title">正在生成 PDF…</div>
-          <div class="status-sub">填寫 Progress 工作表並匯出至 Google Drive 「Visiting Record」。通常需要 10–20 秒。</div>
+          <div class="status-title">PDF 已成功儲存</div>
+          <div class="status-sub"><b>Progress_${date}.pdf</b> · 共 ${res.count} 條記錄 · 已儲存至 Google Drive</div>
+          <div class="status-actions">
+            <a href="${res.url}" target="_blank" class="btn btn-soft" style="padding:10px 16px;font-size:13px;text-decoration:none"><svg style="width:14px;height:14px"><use href="#i-link"/></svg> 開啟 PDF</a>
+          </div>
         </div>
       </div>`;
-    setTimeout(() => {
-      const d = new Date(date + 'T00:00:00');
-      const count = state.visits.filter(v => ymd(v.date) === date).length || Math.floor(Math.random()*6+3);
-      const label = `${d.getDate()}-${MONTH_NAMES[d.getMonth()].slice(0,3)}-${d.getFullYear()}`;
-      status.innerHTML = `
-        <div class="status-card success">
-          <div class="status-icon"><svg><use href="#i-check"/></svg></div>
-          <div class="status-body">
-            <div class="status-title">PDF 已成功儲存</div>
-            <div class="status-sub"><b>${label}_Visiting_Record.pdf</b> · 共 ${count} 條記錄 · 已儲存至 Google Drive</div>
-            <div class="status-actions">
-              <button class="btn btn-soft" style="padding:10px 16px;font-size:13px"><svg style="width:14px;height:14px"><use href="#i-link"/></svg>開啟 PDF</button>
-              <button class="btn btn-ghost" style="padding:10px 16px;font-size:13px"><svg style="width:14px;height:14px"><use href="#i-download"/></svg>下載本機</button>
-            </div>
-          </div>
-        </div>`;
-      btn.disabled = false;
-      btn.innerHTML = '<svg style="width:16px;height:16px"><use href="#i-download"/></svg>生成並儲存 PDF';
-    }, 1800);
-  });
+    const exports = getExportsCache();
+    exports.unshift({ name:`Progress_${date}.pdf`, url:res.url, date:new Date().toISOString(), count:res.count });
+    localStorage.setItem(LS_EXPORTS, JSON.stringify(exports.slice(0,15)));
+    renderPDFRecent();
+  } catch(err) {
+    status.innerHTML = `
+      <div class="status-card error">
+        <div class="status-icon"><svg><use href="#i-alert"/></svg></div>
+        <div class="status-body">
+          <div class="status-title">生成失敗</div>
+          <div class="status-sub">${err.message}</div>
+        </div>
+      </div>`;
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg style="width:16px;height:16px"><use href="#i-download"/></svg> 生成並儲存 PDF';
 }
-function renderPDFRecent(){ /* static in HTML */ }
+
+function getExportsCache(){ try { return JSON.parse(localStorage.getItem(LS_EXPORTS)||'[]'); } catch(_){ return []; } }
+
+async function loadPDFExports(){
+  renderPDFRecent(); // show cache first
+  try {
+    const res = await api({ action:'listExports' });
+    if (res.ok && res.exports.length) {
+      localStorage.setItem(LS_EXPORTS, JSON.stringify(res.exports));
+      state.exportsLoaded = true;
+      renderPDFRecent();
+    }
+  } catch(_) {}
+}
+
+function renderPDFRecent(){
+  const exports = getExportsCache();
+  const container = document.getElementById('pdf-recent');
+  if (!exports.length){ container.innerHTML = emptyState('i-file','尚無匯出記錄','生成 PDF 後會顯示於此。'); return; }
+  container.innerHTML = exports.map(e => {
+    const d = new Date(e.date);
+    const dayStr  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    const dateStr = `${d.getDate()} ${MONTH_NAMES[d.getMonth()].slice(0,3)}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return `
+      <div class="pdf-row">
+        <div class="pdf-ic"></div>
+        <div class="pdf-meta">
+          <div class="pdf-name">${e.name}</div>
+          <div class="pdf-sub">${dayStr} · 匯出於 ${dateStr}</div>
+        </div>
+        ${e.count !== undefined ? `<div class="pdf-count">${e.count} 條</div>` : ''}
+        ${e.url ? `<a href="${e.url}" target="_blank" class="iconbtn" title="Open"><svg><use href="#i-link"/></svg></a>` : ''}
+      </div>`;
+  }).join('');
+}
 
 // ═════════════════ STATS ═════════════════
 function initStats(){
-  document.getElementById('stats-query-btn').addEventListener('click', renderStatsForCurrentMonth);
-  document.getElementById('stats-export-btn').addEventListener('click', () => toast('月報匯出中…','success'));
+  document.getElementById('stats-query-btn').addEventListener('click', fetchStats);
+  document.getElementById('stats-export-btn').addEventListener('click', exportMonthCSV);
 }
-function renderStatsForCurrentMonth(){
+
+async function fetchStats(){
   const monthVal = document.getElementById('stats-month').value;
   if (!monthVal) return;
-  const [yr,mo] = monthVal.split('-').map(Number);
-  const inMonth = state.visits.filter(v => v.date.getFullYear() === yr && v.date.getMonth() === mo - 1);
-  const counts = {
-    Consultation: inMonth.filter(v => v.type === 'Consultation').length,
-    Assessment:   inMonth.filter(v => v.type === 'Assessment').length,
-    Treatment:    inMonth.filter(v => v.type === 'Treatment').length,
-    Others:       inMonth.filter(v => v.type === 'Others').length
-  };
-  const total = inMonth.length;
+  const btn = document.getElementById('stats-query-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span>';
+  try {
+    const res = await api({ action:'getStats', month:monthVal });
+    if (res.ok) { renderStatsData(res); state.statsLoaded = true; }
+    else toast('統計查詢失敗：' + (res.error||''),'error');
+  } catch(err) { toast('連接失敗：' + err.message,'error'); }
+  btn.disabled = false;
+  btn.innerHTML = '<svg style="width:16px;height:16px"><use href="#i-search"/></svg> 查詢';
+}
+
+function renderStatsData(res){
+  const { counts, total, month, avg, busiestType, trend } = res;
+  const [yr,mo] = month.split('-').map(Number);
   const max = Math.max(1, ...Object.values(counts));
-  ['consultation','assessment','treatment','others'].forEach((k,i) => {
-    const key = k[0].toUpperCase()+k.slice(1);
-    const n = counts[key];
+  ['consultation','assessment','treatment','others'].forEach(k => {
+    const key = k[0].toUpperCase()+k.slice(1), n = counts[key]||0;
     const pct = total ? Math.round(n/total*100) : 0;
     document.getElementById('n-'+k).textContent = n;
     document.getElementById('p-'+k).textContent = pct+'%';
@@ -1948,22 +2010,14 @@ function renderStatsForCurrentMonth(){
   });
   document.getElementById('n-total').textContent = total;
   document.getElementById('stats-month-label').textContent = `${MONTH_NAMES[mo-1]} ${yr}`;
+  document.getElementById('chip-avg').textContent  = avg || '0';
+  document.getElementById('chip-busy').textContent = busiestType || '—';
+  document.getElementById('chip-trend').textContent = trend || '+0%';
 
-  // chips
-  const workingDays = 20;
-  document.getElementById('chip-avg').textContent = (total/workingDays).toFixed(1);
-  // busiest type
-  let best = 'Consultation', bv = 0;
-  Object.entries(counts).forEach(([k,v]) => { if (v > bv){ best = k; bv = v; } });
-  document.getElementById('chip-busy').textContent = best;
-  document.getElementById('chip-trend').textContent = (total > 30 ? '+12%' : '-4%');
-
-  // donut
   const segs = ['Consultation','Assessment','Treatment','Others'];
   let offset = 25;
   segs.forEach((k,i) => {
-    const n = counts[k];
-    const pct = total ? (n/total*100) : 0;
+    const n = counts[k]||0, pct = total ? (n/total*100) : 0;
     const c = document.getElementById('donut-c'+(i+1));
     c.setAttribute('stroke-dasharray', `${pct} ${100-pct}`);
     c.setAttribute('stroke-dashoffset', offset);
@@ -1971,155 +2025,163 @@ function renderStatsForCurrentMonth(){
   });
   const colors = ['#3d633e','#6e9f5a','#a6cf98','#c1ebb3'];
   document.getElementById('donut-legend').innerHTML = segs.map((k,i) =>
-    `<div class="legend-row">
-      <span class="sw" style="background:${colors[i]}"></span>
-      <span class="lg-name">${k}</span>
-      <span class="lg-val mono">${counts[k]}</span>
-    </div>`).join('');
+    `<div class="legend-row"><span class="sw" style="background:${colors[i]}"></span><span class="lg-name">${k}</span><span class="lg-val mono">${counts[k]||0}</span></div>`).join('');
+}
+
+async function exportMonthCSV(){
+  const monthVal = document.getElementById('stats-month').value;
+  if (!monthVal) return toast('請選擇月份','error');
+  try {
+    const res = await api({ action:'getRecords', month:monthVal, limit:9999 });
+    if (!res.ok) throw new Error(res.error);
+    const rows = [['日期','類別','學員','單位','內容','備註']];
+    res.records.forEach(r => rows.push([r.date, r.type, r.client, r.unit, r.content, r.notes]));
+    const csv  = rows.map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\ufeff'+csv], { type:'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=`OT_Log_${monthVal}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast('✓ CSV 已下載','success');
+  } catch(err) { toast('匯出失敗：' + err.message,'error'); }
 }
 
 // ═════════════════ CLIENTS ═════════════════
 function initClients(){
-  document.getElementById('mgr-search').addEventListener('input', e => {
-    state.mgrSearch = e.target.value.trim();
-    renderClients();
-  });
+  document.getElementById('mgr-search').addEventListener('input', e => { state.mgrSearch = e.target.value.trim(); renderClients(); });
   document.getElementById('mgr-add-btn').addEventListener('click', () => {
     const name = prompt('新增學員名稱 / Client name:');
     if (name && name.trim()) {
       const n = name.trim();
       if (state.clients[state.mgrUnit].includes(n)) return toast('已在名單中','error');
       state.clients[state.mgrUnit].push(n);
-      toast(`✓ 已新增 ${n}`,'success');
-      renderClients();
+      toast(`✓ 已新增 ${n}，請按「儲存」`,'success'); renderClients();
     }
   });
   document.getElementById('batch-add-btn').addEventListener('click', () => {
-    const raw = document.getElementById('batchInput').value;
-    const names = raw.split('\n').map(n => n.trim()).filter(Boolean);
+    const names = document.getElementById('batchInput').value.split('\n').map(n=>n.trim()).filter(Boolean);
     let added = 0;
     names.forEach(n => { if (!state.clients[state.mgrUnit].includes(n)) { state.clients[state.mgrUnit].push(n); added++; } });
     document.getElementById('batchInput').value = '';
-    renderClients();
-    toast(`✓ 加入了 ${added} 個學員 (${state.mgrUnit})`,'success');
+    renderClients(); toast(`✓ 加入了 ${added} 個學員 (${state.mgrUnit})，請按「儲存」`,'success');
   });
-  document.getElementById('mgr-save-btn').addEventListener('click', () => toast('✓ 名單已儲存至 Google Sheet','success'));
-  document.getElementById('mgr-reload-btn').addEventListener('click', () => toast('重新載入中…'));
+  document.getElementById('mgr-save-btn').addEventListener('click',   saveClients);
+  document.getElementById('mgr-reload-btn').addEventListener('click', () => loadClients().then(() => toast('✓ 名單已重新載入','success')));
 }
-function renderClients(){
-  const roster = state.clients[state.mgrUnit];
+
+async function saveClients(){
+  const btn = document.getElementById('mgr-save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span> 儲存中…';
+  try {
+    const res = await api({ action:'saveClients', data:JSON.stringify(state.clients) });
+    if (!res.ok) throw new Error(res.error||'儲存失敗');
+    localStorage.setItem(LS_CLIENTS, JSON.stringify(state.clients));
+    toast('✓ 名單已儲存至 Google Sheet','success');
+  } catch(err) { toast('儲存失敗：' + err.message,'error'); }
+  btn.disabled = false;
+  btn.innerHTML = '<svg style="width:16px;height:16px"><use href="#i-check"/></svg> 儲存名單至 Google Sheet';
+}
+
+function renderClientCounts(){
   document.getElementById('c-cwl').textContent = state.clients.CWL.length;
   document.getElementById('c-ccl').textContent = state.clients.CCL.length;
   document.getElementById('c-jyw').textContent = state.clients.JYW.length;
+}
+
+function renderClients(){
+  const roster = state.clients[state.mgrUnit];
+  renderClientCounts();
   document.getElementById('mgr-count').textContent = roster.length;
   document.getElementById('mgr-total').textContent = state.clients.CWL.length + state.clients.CCL.length + state.clients.JYW.length;
-  const filtered = state.mgrSearch
-    ? roster.filter(n => n.toLowerCase().includes(state.mgrSearch.toLowerCase()))
-    : [...roster];
-  filtered.sort();
+  const filtered = (state.mgrSearch ? roster.filter(n=>n.toLowerCase().includes(state.mgrSearch.toLowerCase())) : [...roster]).sort();
   const table = document.getElementById('cli-table');
-  if (!filtered.length) { table.innerHTML = emptyState('i-users','名單為空','使用「新增學員」或「批量輸入」加入。'); return; }
-  // Synthesize "last visit" info based on visits
-  const lastMap = {};
+  if (!filtered.length){ table.innerHTML = emptyState('i-users','名單為空','使用「新增學員」或「批量輸入」加入。'); return; }
+  const visitMap = {};
   state.visits.forEach(v => {
-    if (v.unit === state.mgrUnit) {
-      if (!lastMap[v.client] || v.date > lastMap[v.client].date)
-        lastMap[v.client] = { date: v.date, count: (lastMap[v.client]?.count || 0) + 1 };
-      else lastMap[v.client].count++;
+    const u = v.unit || guessUnit(v.client);
+    if (u === state.mgrUnit) {
+      if (!visitMap[v.client]) visitMap[v.client] = { count:0, date:v.date };
+      visitMap[v.client].count++;
+      if (v.date > visitMap[v.client].date) visitMap[v.client].date = v.date;
     }
   });
   table.innerHTML = filtered.map((n,i) => {
-    const info = lastMap[n];
-    const visits = info ? info.count : 0;
-    const last = info ? relativeTime(info.date) : '—';
+    const info = visitMap[n];
     return `
       <div class="cli-row">
         <div class="idx mono">${String(i+1).padStart(2,'0')}</div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="av">${n[0]}</div>
-          <div class="nm">${n}</div>
-        </div>
-        <div class="visits mono">${visits} visits</div>
-        <div class="last">${last}</div>
-        <div class="act"><button class="ibtn" onclick="delClient('${n}')"><svg><use href="#i-trash"/></svg></button></div>
+        <div style="display:flex;align-items:center;gap:12px"><div class="av">${n[0]}</div><div class="nm">${n}</div></div>
+        <div class="visits mono">${info ? info.count : 0} visits</div>
+        <div class="last">${info ? relativeTime(info.date) : '—'}</div>
+        <div class="act"><button class="ibtn" onclick="delClient('${n.replace(/'/g,"\\'")}')"><svg><use href="#i-trash"/></svg></button></div>
       </div>`;
   }).join('');
 }
+
 function delClient(n){
   state.clients[state.mgrUnit] = state.clients[state.mgrUnit].filter(x => x !== n);
-  renderClients();
-  toast(`已移除 ${n}`);
+  renderClients(); toast(`已移除 ${n}，請按「儲存」以更新 Sheet`);
 }
 
 // ═════════════════ SETTINGS ═════════════════
 function initSettings(){
-  document.getElementById('settingsUrl').value = 'https://script.google.com/macros/s/AKfycbzrbwb5MLJgXPTDYq0guIyft-eU6W8l1vJ5D10Gt-eYoFPTGCK9VinOPjL6ZSpLakY4/exec';
-  document.getElementById('upd-url-btn').addEventListener('click', () => toast('✓ 網址已更新','success'));
-  document.getElementById('reload-cli-btn').addEventListener('click', () => toast('重新載入中…'));
-  document.querySelectorAll('.switch').forEach(sw => {
-    sw.addEventListener('click', () => {
-      sw.classList.toggle('on');
-      if (sw.dataset.tweak === 'showIcons') {
-        tweaks.showIcons = sw.classList.contains('on');
-        document.body.classList.toggle('no-icons', !tweaks.showIcons);
-        postTweak('showIcons', tweaks.showIcons);
-      }
-    });
+  const urlEl = document.getElementById('settingsUrl');
+  urlEl.value = getScriptUrl();
+  document.getElementById('upd-url-btn').addEventListener('click', () => {
+    const v = urlEl.value.trim();
+    if (!v) return toast('請輸入有效 URL','error');
+    localStorage.setItem(LS_URL, v); toast('✓ 網址已更新','success');
+  });
+  document.getElementById('reload-cli-btn').addEventListener('click', () =>
+    loadClients().then(() => toast('✓ 學員名單已重新載入','success')));
+
+  // Prefs switches
+  document.querySelectorAll('.switch[data-key]').forEach(sw => {
+    sw.classList.toggle('on', !!prefs[sw.dataset.key]);
+    sw.addEventListener('click', () => { sw.classList.toggle('on'); savePref(sw.dataset.key, sw.classList.contains('on')); });
+  });
+
+  // Clear cache
+  document.querySelector('.btn-danger-ghost').addEventListener('click', () => {
+    if (!confirm('清除本機快取？這將重設 URL、名單快取及草稿。')) return;
+    [LS_URL, LS_CLIENTS, LS_DRAFTS, LS_PREFS, LS_EXPORTS].forEach(k => localStorage.removeItem(k));
+    urlEl.value = DEFAULT_SCRIPT_URL;
+    toast('✓ 快取已清除','success');
   });
 }
 
 // ═════════════════ TOAST ═════════════════
 let toastTimeout;
 function toast(msg, type=''){
-  const t = document.getElementById('toast');
-  const m = document.getElementById('toast-msg');
-  m.textContent = msg;
-  t.className = 'toast ' + type;
+  const t = document.getElementById('toast'), m = document.getElementById('toast-msg');
+  m.textContent = msg; t.className = 'toast ' + type;
   requestAnimationFrame(() => t.classList.add('show'));
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), 2600);
+  clearTimeout(toastTimeout); toastTimeout = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
 // ═════════════════ TWEAKS ═════════════════
 function applyTweaks(){
   document.body.classList.toggle('compact', tweaks.density === 'compact');
   document.body.classList.toggle('no-icons', !tweaks.showIcons);
-  // Accent variations
-  const accents = {
-    sage:   { primary:'#3d633e', primaryD:'#2f4d30' },
-    forest: { primary:'#2b4e2e', primaryD:'#1f3922' },
-    moss:   { primary:'#5a7c4e', primaryD:'#44613a' }
-  };
+  const accents = { sage:{primary:'#3d633e',primaryD:'#2f4d30'}, forest:{primary:'#2b4e2e',primaryD:'#1f3922'}, moss:{primary:'#5a7c4e',primaryD:'#44613a'} };
   const a = accents[tweaks.accentTone] || accents.sage;
   document.documentElement.style.setProperty('--primary', a.primary);
   document.documentElement.style.setProperty('--primary-d', a.primaryD);
 }
 function setupEditMode(){
-  // Register listener BEFORE announcing availability
-  window.addEventListener('message', (e) => {
-    const msg = e.data;
-    if (!msg || !msg.type) return;
-    if (msg.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('open');
-    else if (msg.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('open');
+  window.addEventListener('message', e => {
+    const msg = e.data; if (!msg||!msg.type) return;
+    if (msg.type==='__activate_edit_mode')   document.getElementById('tweaks').classList.add('open');
+    if (msg.type==='__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('open');
   });
-  // Now announce
-  try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch(_) {}
-
-  // Wire tweaks controls
+  try { window.parent.postMessage({ type:'__edit_mode_available' },'*'); } catch(_){}
   document.querySelectorAll('#tweaks .tw-opts').forEach(opts => {
     const key = opts.dataset.tweak;
     opts.querySelectorAll('.tw-opt').forEach(opt => {
       if (opt.dataset.v === tweaks[key]) opt.classList.add('on');
       opt.addEventListener('click', () => {
-        opts.querySelectorAll('.tw-opt').forEach(x => x.classList.remove('on'));
-        opt.classList.add('on');
-        tweaks[key] = opt.dataset.v;
-        applyTweaks();
-        postTweak(key, opt.dataset.v);
-        if (key === 'mockDataset') {
-          state.visits = genVisits(tweaks.mockDataset);
-          renderAll();
-        }
+        opts.querySelectorAll('.tw-opt').forEach(x=>x.classList.remove('on')); opt.classList.add('on');
+        tweaks[key]=opt.dataset.v; applyTweaks(); postTweak(key,opt.dataset.v);
       });
     });
   });
@@ -2130,13 +2192,9 @@ function setupEditMode(){
     document.body.classList.toggle('no-icons', !tweaks.showIcons);
     postTweak('showIcons', tweaks.showIcons);
   });
-  document.getElementById('tw-close').addEventListener('click', () => {
-    document.getElementById('tweaks').classList.remove('open');
-  });
+  document.getElementById('tw-close').addEventListener('click', () => document.getElementById('tweaks').classList.remove('open'));
 }
-function postTweak(key, val){
-  try { window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*'); } catch(_) {}
-}
+function postTweak(key,val){ try { window.parent.postMessage({type:'__edit_mode_set_keys',edits:{[key]:val}},'*'); } catch(_){} }
 
 // ═════════════════ GO ═════════════════
 boot();
